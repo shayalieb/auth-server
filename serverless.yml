@@ -1,0 +1,46 @@
+org: shayalieb
+app: auth-server
+#Serverless server
+service: auth-server
+
+#Framework
+frameworkVersion: '3'
+
+#Serverless provider
+provider:
+  name: aws 
+  runtime: nodejs12.x
+  region: us-east-1
+  timeout: 60
+  #serverless access variable environment
+  environment:
+    CLIENT_ID: ${file(config.json):CLIENT_ID}
+    CLIENT_SECRET: ${file(config.json):CLIENT_SECRET}
+    PROJECT_ID: ${file(config.json):PROJECT_ID}
+    CALENDAR_ID: ${file(config.json):CALENDAR_ID}
+
+
+#Serverless function
+functions:
+  getAuthURL:
+    handler: handler.getAuthURL
+    events: 
+      - http: 
+         path: api/get-auth-url
+         method: get
+
+  getAccessToken:
+    handler: handler.getAccessToken        
+    events:
+      - http:
+#The curly braces {code} allows you to pass the information from the first function, and allow the auth code to pass into this function
+         path: api/token/{code}
+         method: get
+
+  getCalendarEvents:
+    handler: handler.getCalendarEvents
+    events:
+      - http:
+         path: api/get-events/{access_token}
+         method: get      
+
